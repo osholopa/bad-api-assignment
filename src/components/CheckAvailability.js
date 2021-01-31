@@ -37,7 +37,10 @@ const CheckAvailability = ({ product }) => {
 
   const foundFromState = (product) => {
     if (state[product.manufacturer]) {
-      return state[product.manufacturer].find((obj) => (obj.id = product.id))
+      return state[product.manufacturer].find(
+        (obj) =>
+          String(obj.id).toUpperCase() === String(product.id).toUpperCase()
+      )
     }
     return null
   }
@@ -53,7 +56,7 @@ const CheckAvailability = ({ product }) => {
     }
     dispatch(addAvailability(product.manufacturer, response.data))
     const resultObject = response.data.response.find(
-      (obj) => (obj.id = product.id)
+      (obj) => String(obj.id).toUpperCase() === String(product.id).toUpperCase()
     )
     return utils.parseAvailability(resultObject.DATAPAYLOAD)
   }
@@ -102,18 +105,19 @@ const CheckAvailability = ({ product }) => {
       <Backdrop
         className={classes.backdrop}
         open={loading}
-        onClick={() => setLoading(false)}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title">Availability result</DialogTitle>
-        <DialogContent>
-          {result ? (
+      {result ? (
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">
+            Availability check result
+          </DialogTitle>
+          <DialogContent>
             <div>
               {Object.keys(product).map((key) => (
                 <DialogContentText key={key}>
@@ -122,18 +126,16 @@ const CheckAvailability = ({ product }) => {
               ))}
               <DialogContentText>AVAILABILITY: {result}</DialogContentText>
             </div>
-          ) : null}
-        </DialogContent>
-        <DialogActions>
-          {result ? (
+          </DialogContent>
+          <DialogActions>
             <div>
               <Button onClick={handleClose} color="primary">
                 Ok
               </Button>
             </div>
-          ) : null}
-        </DialogActions>
-      </Dialog>
+          </DialogActions>
+        </Dialog>
+      ) : null}
     </div>
   )
 }
