@@ -7,3 +7,10 @@ export const addProducts = (category, products) => {
     },
   }
 }
+
+export const addAvailability = (manufacturer, data) => {
+  return {
+    type: 'ADD_AVAILABILITY',
+    payload: { manufacturer: manufacturer, data: data.response },
+  }
+}

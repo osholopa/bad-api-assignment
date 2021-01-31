@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { DataGrid } from '@material-ui/data-grid'
 import { CircularProgress } from '@material-ui/core'
@@ -7,9 +7,11 @@ import productService from '../services/products'
 import { StateContext } from '../state'
 import { addProducts } from '../state/actions'
 import utils from '../utils/'
+import CheckAvailability from './CheckAvailability'
 
 const ProductList = ({ category }) => {
   const { state, dispatch } = useContext(StateContext)
+  const [selected, setSelected] = useState(null)
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -27,6 +29,10 @@ const ProductList = ({ category }) => {
     fetchProducts()
   }, [category])
 
+  const handleSelect = (selection) => {
+    setSelected(selection.data)
+  }
+
   const columns = [
     { field: 'id', headerName: 'ID', width: 250 },
     { field: 'type', headerName: 'Type', width: 130 },
@@ -39,8 +45,16 @@ const ProductList = ({ category }) => {
   if (utils.isEmpty(state[category])) return <CircularProgress />
 
   return (
-    <div style={{ height: '90vh', width: '90vw' }}>
-      <DataGrid rows={state[category]} columns={columns} pageSize={100} />
+    <div>
+      <div style={{ height: '90vh', width: '100%' }}>
+        <DataGrid
+          onRowSelected={handleSelect}
+          rows={state[category]}
+          columns={columns}
+          pageSize={100}
+        />
+      </div>
+      <CheckAvailability product={selected} />
     </div>
   )
 }

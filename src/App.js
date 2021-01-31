@@ -11,7 +11,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Menu />
-      <Container>
+      <Container maxWidth="xl">
         <Switch>
           <Route path="/" exact>
             <ProductList category="gloves" />
