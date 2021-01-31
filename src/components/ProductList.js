@@ -18,9 +18,7 @@ const ProductList = ({ category }) => {
       if (utils.isEmpty(state[category])) {
         try {
           const response = await productService.getByCategory(category)
-          if (response.status === 200) {
-            dispatch(addProducts(category, response.data))
-          }
+          dispatch(addProducts(category, response))
         } catch (error) {
           console.log(error)
         }

@@ -46,16 +46,12 @@ const CheckAvailability = ({ product }) => {
   }
 
   const fetchAvailability = async (product) => {
-    let response = await availabilityService.getByManufacturer(
-      product.manufacturer
-    )
-    while (response.data.response === '[]') {
-      response = await availabilityService.getByManufacturer(
-        product.manufacturer
-      )
+    let data = await availabilityService.getByManufacturer(product.manufacturer)
+    while (data.response === '[]') {
+      data = await availabilityService.getByManufacturer(product.manufacturer)
     }
-    dispatch(addAvailability(product.manufacturer, response.data))
-    const resultObject = response.data.response.find(
+    dispatch(addAvailability(product.manufacturer, data))
+    const resultObject = data.response.find(
       (obj) => String(obj.id).toUpperCase() === String(product.id).toUpperCase()
     )
     return utils.parseAvailability(resultObject.DATAPAYLOAD)
@@ -102,10 +98,7 @@ const CheckAvailability = ({ product }) => {
       >
         CHECK PRODUCT AVAILABILITY
       </Button>
-      <Backdrop
-        className={classes.backdrop}
-        open={loading}
-      >
+      <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
       {result ? (
