@@ -24,7 +24,10 @@ module.exports = {
   },
   rules: {
     indent: 0,
-    'linebreak-style': ['error', 'windows'],
+    'linebreak-style': [
+      'error',
+      process.env.NODE_ENV === 'production' ? 'unix' : 'windows',
+    ],
     quotes: ['error', 'single'],
     semi: ['error', 'never'],
     eqeqeq: 'error',
