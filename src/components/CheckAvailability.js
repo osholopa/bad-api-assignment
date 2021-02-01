@@ -24,6 +24,9 @@ const useStyles = makeStyles((theme) => ({
   marginTop: {
     marginTop: 20,
   },
+  red: { color: theme.palette.error.main },
+  yellow: { color: theme.palette.warning.main },
+  green: { color: theme.palette.success.main },
 }))
 
 const CheckAvailability = ({ product }) => {
@@ -87,6 +90,19 @@ const CheckAvailability = ({ product }) => {
     }
   }
 
+  let resultColor = 'green'
+
+  switch (result) {
+    case 'OUTOFSTOCK':
+      resultColor = 'red'
+      break
+    case 'LESSTHAN10':
+      resultColor = 'yellow'
+      break
+    default:
+      break
+  }
+
   return (
     <div>
       <Button
@@ -117,7 +133,9 @@ const CheckAvailability = ({ product }) => {
                   {key.toUpperCase()}: {product[key]}
                 </DialogContentText>
               ))}
-              <DialogContentText>AVAILABILITY: {result}</DialogContentText>
+              <DialogContentText className={classes[resultColor]}>
+                AVAILABILITY: {result}
+              </DialogContentText>
             </div>
           </DialogContent>
           <DialogActions>
