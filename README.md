@@ -12,7 +12,10 @@ Here are the instructions to get the local development environment up and runnin
 4. Move to the created folder by typing `cd bad-api-assignment`.
 5. Install required dependencies with command `npm install`
 
-### To start the project
+## To start the project
 
 1. Use script `npm start`.
    A local server should start up and you should be able to access the application with the address `http://localhost:3000/`. Any changes made to the code should be visible instantly on your browser.
+
+## To run tests
+1. Use script `npm test`.
