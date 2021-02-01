@@ -19,7 +19,20 @@ const useStyles = makeStyles(() => ({
   },
 }))
 
-const ProductList = ({ category }) => {
+export const ProductList = ({ columns, rows, handleSelect, ...props }) => {
+  return (
+    <DataGrid
+      onRowSelected={handleSelect}
+      rows={rows}
+      columns={columns}
+      pageSize={100}
+      checkboxSelection={false}
+      {...props}
+    />
+  )
+}
+
+const ProductListContainer = ({ category }) => {
   const { state, dispatch } = useContext(StateContext)
   const [selected, setSelected] = useState(null)
   const classes = useStyles()
@@ -60,12 +73,11 @@ const ProductList = ({ category }) => {
 
   return (
     <Box className={classes.container}>
-      <div style={{ height: '80%', width: '100%' }}>
-        <DataGrid
-          onRowSelected={handleSelect}
-          rows={state[category]}
+      <div style={{ height: '90%', width: '100%' }}>
+        <ProductList
           columns={columns}
-          pageSize={100}
+          rows={state[category]}
+          handleSelect={handleSelect}
         />
       </div>
       <CheckAvailability product={selected} />
@@ -74,7 +86,15 @@ const ProductList = ({ category }) => {
 }
 
 ProductList.propTypes = {
+  columns: PropTypes.array.isRequired,
+  rows: PropTypes.array.isRequired,
+  autoHeight: PropTypes.bool,
+  handleSelect: PropTypes.func,
+  selected: PropTypes.object,
+}
+
+ProductListContainer.propTypes = {
   category: PropTypes.string.isRequired,
 }
 
-export default ProductList
+export default ProductListContainer
