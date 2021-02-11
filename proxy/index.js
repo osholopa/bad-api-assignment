@@ -11,6 +11,22 @@ function uniquePredicate(value, index, self) {
   return self.indexOf(value) === index
 }
 
+async function validateResponses(manufacturers, responses) {
+  
+  const validatedResponsePromises = responses.map(async (response, index) => {
+    let validatedResponse = response
+    while (validatedResponse.data.response === '[]') {
+     
+      validatedResponse = await axios.get(
+        `${config.API_URL}/availability/${manufacturers[index]}`
+      )
+    }
+    return validatedResponse
+  })
+  const validatedResponses = await Promise.all(validatedResponsePromises)
+  return validatedResponses
+}
+
 async function addAvailabilityTo(products) {
   const manufacturers = products
     .map((p) => p.manufacturer)
@@ -21,11 +37,13 @@ async function addAvailabilityTo(products) {
       axios.get(`${config.API_URL}/availability/${manufacturer}`)
     )
 
-    console.log('getting availability')
     const availabilityResponses = await Promise.all(availabilityRequests)
-    const manufacturerAvailabilityPromises = availabilityResponses.map(
+    const validatedResponses = await validateResponses(
+      manufacturers,
+      availabilityResponses
+    )
+    const manufacturerAvailabilityPromises = validatedResponses.map(
       async (item, index) => {
-       
         const xmlPromises = item.data.response.map(async (product) => ({
           id: String(product.id).toLowerCase(),
           availability: (await xml2js.parseStringPromise(product.DATAPAYLOAD))
@@ -53,7 +71,6 @@ async function addAvailabilityTo(products) {
         (availability) => availability.id === product.id
       ).availability,
     }))
-
   } catch (err) {
     console.log('Error: ', err)
   }

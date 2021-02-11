@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { DataGrid } from '@material-ui/data-grid'
 import { CircularProgress, Box, makeStyles } from '@material-ui/core'
@@ -7,7 +7,6 @@ import productService from '../services/products'
 import { StateContext } from '../state'
 import { addProducts } from '../state/actions'
 import utils from '../utils/'
-import CheckAvailability from './CheckAvailability'
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -19,10 +18,9 @@ const useStyles = makeStyles(() => ({
   },
 }))
 
-export const ProductList = ({ columns, rows, handleSelect, ...props }) => {
+export const ProductList = ({ columns, rows, ...props }) => {
   return (
     <DataGrid
-      onRowSelected={handleSelect}
       rows={rows}
       columns={columns}
       pageSize={100}
@@ -34,7 +32,7 @@ export const ProductList = ({ columns, rows, handleSelect, ...props }) => {
 
 const ProductListContainer = ({ category }) => {
   const { state, dispatch } = useContext(StateContext)
-  const [selected, setSelected] = useState(null)
+
   const classes = useStyles()
 
   useEffect(() => {
@@ -51,16 +49,13 @@ const ProductListContainer = ({ category }) => {
     fetchProducts()
   }, [category])
 
-  const handleSelect = (selection) => {
-    setSelected(selection.data)
-  }
-
   const columns = [
     { field: 'id', headerName: 'ID', width: 250 },
     { field: 'manufacturer', headerName: 'Manufacturer', width: 150 },
     { field: 'name', headerName: 'Name', width: 200 },
     { field: 'color', headerName: 'Color', width: 130 },
     { field: 'price', headerName: 'Price', width: 130 },
+    { field: 'availability', headerName: 'Availability', width: 130 },
     { field: 'type', headerName: 'Type', width: 130 },
   ]
 
@@ -74,13 +69,8 @@ const ProductListContainer = ({ category }) => {
   return (
     <Box className={classes.container}>
       <div style={{ height: '90%', width: '100%' }}>
-        <ProductList
-          columns={columns}
-          rows={state[category]}
-          handleSelect={handleSelect}
-        />
+        <ProductList columns={columns} rows={state[category]} />
       </div>
-      <CheckAvailability product={selected} />
     </Box>
   )
 }
@@ -89,7 +79,6 @@ ProductList.propTypes = {
   columns: PropTypes.array.isRequired,
   rows: PropTypes.array.isRequired,
   autoHeight: PropTypes.bool,
-  handleSelect: PropTypes.func,
   selected: PropTypes.object,
 }
 
