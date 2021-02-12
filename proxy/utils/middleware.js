@@ -30,7 +30,7 @@ async function extendTimeout(req, res, next){
         res.write(space)
         waitAndSend()
       }
-    }, 1000)
+    }, 29500)
   }
   waitAndSend()
   next()
