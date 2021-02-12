@@ -1,28 +1,35 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { DataGrid } from '@material-ui/data-grid'
 import { CircularProgress, Box, makeStyles } from '@material-ui/core'
-
+import clsx from 'clsx'
 import productService from '../services/products'
-import { StateContext } from '../state'
-import { addProducts } from '../state/actions'
-import utils from '../utils/'
-import CheckAvailability from './CheckAvailability'
 
 const useStyles = makeStyles(() => ({
-  container: {
+  root: {
     height: '90vh',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    '& .availability.positive': {
+      backgroundColor: '#07ad0f',
+      color: '#032d05',
+    },
+    '& .availability.negative': {
+      backgroundColor: '#c9021d',
+      color: '#fafafa',
+    },
+    '& .availability.neutral': {
+      backgroundColor: '#f2d40c',
+      color: '#756602',
+    },
   },
 }))
 
-export const ProductList = ({ columns, rows, handleSelect, ...props }) => {
+export const ProductList = ({ columns, rows, ...props }) => {
   return (
     <DataGrid
-      onRowSelected={handleSelect}
       rows={rows}
       columns={columns}
       pageSize={100}
@@ -33,27 +40,23 @@ export const ProductList = ({ columns, rows, handleSelect, ...props }) => {
 }
 
 const ProductListContainer = ({ category }) => {
-  const { state, dispatch } = useContext(StateContext)
-  const [selected, setSelected] = useState(null)
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
   const classes = useStyles()
 
   useEffect(() => {
+    setLoading(true)
     const fetchProducts = async () => {
-      if (utils.isEmpty(state[category])) {
-        try {
-          const response = await productService.getByCategory(category)
-          dispatch(addProducts(category, response))
-        } catch (error) {
-          console.log(error)
-        }
+      try {
+        const response = await productService.getByCategory(category)
+        setProducts(response)
+        setLoading(false)
+      } catch (error) {
+        console.log(error)
       }
     }
     fetchProducts()
   }, [category])
-
-  const handleSelect = (selection) => {
-    setSelected(selection.data)
-  }
 
   const columns = [
     { field: 'id', headerName: 'ID', width: 250 },
@@ -61,26 +64,32 @@ const ProductListContainer = ({ category }) => {
     { field: 'name', headerName: 'Name', width: 200 },
     { field: 'color', headerName: 'Color', width: 130 },
     { field: 'price', headerName: 'Price', width: 130 },
+    {
+      field: 'availability',
+      headerName: 'Availability',
+      width: 130,
+      cellClassName: (params) =>
+        clsx('availability', {
+          positive: params.value === 'INSTOCK',
+          negative: params.value === 'OUTOFSTOCK',
+          neutral: params.value === 'LESSTHAN10',
+        }),
+    },
     { field: 'type', headerName: 'Type', width: 130 },
   ]
 
-  if (utils.isEmpty(state[category]))
+  if (loading)
     return (
-      <Box className={classes.container}>
+      <Box className={classes.root}>
         <CircularProgress style={{ margin: '0px auto' }} />
       </Box>
     )
 
   return (
-    <Box className={classes.container}>
+    <Box className={classes.root}>
       <div style={{ height: '90%', width: '100%' }}>
-        <ProductList
-          columns={columns}
-          rows={state[category]}
-          handleSelect={handleSelect}
-        />
+        <ProductList columns={columns} rows={products} />
       </div>
-      <CheckAvailability product={selected} />
     </Box>
   )
 }
@@ -89,7 +98,6 @@ ProductList.propTypes = {
   columns: PropTypes.array.isRequired,
   rows: PropTypes.array.isRequired,
   autoHeight: PropTypes.bool,
-  handleSelect: PropTypes.func,
   selected: PropTypes.object,
 }
 
