@@ -5,7 +5,7 @@ const axios = require('axios')
 const xml2js = require('xml2js')
 const app = express()
 const redis = require('redis')
-const middleware = require('./utils/middleware')
+const DelayedResponse = require('http-delayed-response')
 
 app.use(cors())
 app.use(express.static('build'))
@@ -132,8 +132,6 @@ async function availabilityCache(req, res, next) {
   })
 }
 
-app.use(middleware.extendTimeout)
-
 app.get(
   '/api/products/:category',
   productCache,
@@ -141,7 +139,14 @@ app.get(
   async (req, res) => {
     const { category } = req.params
     const products = await fetchProducts(category)
-    res.end(await addAvailabilityTo(products))
+
+    async function slowFunction() {
+      const productsWithAvailabilities = await addAvailabilityTo(products)
+      return productsWithAvailabilities
+    }
+    var delayed = new DelayedResponse(req, res)
+    const responseData = await slowFunction(delayed.start(10000, 10000))
+    res.end(responseData)
   }
 )
 
