@@ -6,7 +6,7 @@ Assignment for Reaktor junior dev positions 2021
 
 Here are the instructions to get the local development environment up and running. The instructions are for Windows but the steps for other environments should be similar.
 
-This project consists of a proxy server and a front-end client that gets data from two legacy APIs via the proxy.
+This project consists of a _proxy server_ and a _front-end client_ that gets data from two legacy APIs via the proxy. Front-end client is served statically from the proxy
 
 1. Ensure [Git](https://git-scm.com/downloads) and [Node.js](https://nodejs.org/en/) are installed.
 2. Open Git Bash in the directory where you want the project to be saved.
@@ -16,20 +16,24 @@ This project consists of a proxy server and a front-end client that gets data fr
 6. On one terminal, type `cd proxy` and run `npm install`
 7. On the other, type `cd client` and repeat `npm install`
 
-## To start the project
-1. Open two terminal windows in /client and in /proxy
-2. Start proxy with `npm start`
-3. Start client with `npm start`
+## To start the project in dev mode
+1. Open two terminal windows in project root
+2. Inside _proxy_ folder, run `npm run dev`
+3. Inside _client_ folder, run `npm start`
+
+## Running frontend production build locally
+1. Inside _proxy_ folder, run `npm run build:ui && npm start`
 
 ## Available scripts
 
 ### Client
-
+  Scripts runnable inside folder /client
 - `npm start` - A local server should start up and you should be able to access the application with the address `http://localhost:3000/`. Any changes made to the code should be visible instantly on your browser.
-
 - `npm test` - Runs the tests.
+- `npm run lint` - Runs ESLint.
 
 ### Proxy
-
+  Scripts runnable inside folder /proxy
 - `npm run dev` - Starts proxy server with nodemon watching for changes in the code.
-- `npm start` - Starts server without watch mode
+- `npm start` - Starts server without watch mode.
+- `npm run build:ui` - Removes current front-end build and rebuilds it
