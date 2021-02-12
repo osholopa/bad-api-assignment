@@ -41,13 +41,16 @@ export const ProductList = ({ columns, rows, ...props }) => {
 
 const ProductListContainer = ({ category }) => {
   const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
   const classes = useStyles()
 
   useEffect(() => {
+    setLoading(true)
     const fetchProducts = async () => {
       try {
         const response = await productService.getByCategory(category)
         setProducts(response)
+        setLoading(false)
       } catch (error) {
         console.log(error)
       }
@@ -75,7 +78,7 @@ const ProductListContainer = ({ category }) => {
     { field: 'type', headerName: 'Type', width: 130 },
   ]
 
-  if (products.length === 0)
+  if (loading)
     return (
       <Box className={classes.root}>
         <CircularProgress style={{ margin: '0px auto' }} />
