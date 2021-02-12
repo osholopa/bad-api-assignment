@@ -2,12 +2,21 @@
 
 Assignment for Reaktor junior dev positions 2021
 
-# Cloning & Installation
+[Live demo](https://intense-caverns-36765.herokuapp.com/)
+
+# Local installation
 
 Here are the instructions to get the local development environment up and running. The instructions are for Windows but the steps for other environments should be similar.
 
 This project consists of a _proxy server_ and a _front-end client_ that gets data from two legacy APIs via the proxy. Front-end client is served statically from the proxy
 
+## 1. Install redis
+This project uses [redis](https://redis.io/) so to run it locally, you need to install redis on your machine.
+- [Windows instructions](https://dev.to/divshekhar/how-to-install-redis-on-windows-10-3e99)
+- [Mac instructions](https://medium.com/@petehouston/install-and-config-redis-on-mac-os-x-via-homebrew-eb8df9a4f298)
+- [Linux instructions](https://redis.io/download#installation)
+
+## 2. Clone the repository
 1. Ensure [Git](https://git-scm.com/downloads) and [Node.js](https://nodejs.org/en/) are installed.
 2. Open Git Bash in the directory where you want the project to be saved.
 3. Clone this repository with `git clone` using either HTTPS or SSH
