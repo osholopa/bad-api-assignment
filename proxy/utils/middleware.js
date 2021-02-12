@@ -30,7 +30,7 @@ const extendTimeout = (req, res, next) => {
         res.write(space)
         waitAndSend()
       }
-    }, 15000)
+    }, 100)
   }
   waitAndSend()
   next()
