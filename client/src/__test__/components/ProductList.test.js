@@ -18,6 +18,7 @@ describe('ProductList', () => {
       { field: 'color', headerName: 'Color' },
       { field: 'price', headerName: 'Price' },
       { field: 'type', headerName: 'Type' },
+      { field: 'availability', headerName: 'Availability' },
     ]
     rows = [
       {
@@ -27,6 +28,7 @@ describe('ProductList', () => {
         color: ['black'],
         price: 378,
         manufacturer: 'abiplos',
+        availability: 'INSTOCK',
       },
     ]
     mount = createMount({ mount: render })
@@ -43,7 +45,7 @@ describe('ProductList', () => {
         />
       )
     })
-    expect(await screen.findAllByRole('cell')).toHaveLength(6)
+    expect(await screen.findAllByRole('cell')).toHaveLength(7)
   })
 
   test('renders correct data', async () => {
@@ -64,5 +66,6 @@ describe('ProductList', () => {
     expect(await screen.findByText('black')).toBeDefined()
     expect(await screen.findByText('378')).toBeDefined()
     expect(await screen.findByText('abiplos')).toBeDefined()
+    expect(await screen.findByText('INSTOCK')).toBeDefined()
   })
 })

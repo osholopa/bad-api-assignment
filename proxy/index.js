@@ -4,19 +4,22 @@ const cors = require('cors')
 const axios = require('axios')
 const xml2js = require('xml2js')
 const app = express()
+const redis = require('redis')
 
 app.use(cors())
+
+const PORT = config.PORT
+const REDIS_PORT = config.REDIS_PORT
+const client = redis.createClient(REDIS_PORT)
 
 function uniquePredicate(value, index, self) {
   return self.indexOf(value) === index
 }
 
 async function validateResponses(manufacturers, responses) {
-  
   const validatedResponsePromises = responses.map(async (response, index) => {
     let validatedResponse = response
     while (validatedResponse.data.response === '[]') {
-     
       validatedResponse = await axios.get(
         `${config.API_URL}/availability/${manufacturers[index]}`
       )
@@ -65,6 +68,13 @@ async function addAvailabilityTo(products) {
       {}
     )
 
+    //Set data to redis
+    client.setex(
+      'availabilityDictionary',
+      300,
+      JSON.stringify(availabilityDictionary)
+    )
+
     return products.map((product) => ({
       ...product,
       availability: availabilityDictionary[product.manufacturer].find(
@@ -78,16 +88,57 @@ async function addAvailabilityTo(products) {
 
 async function fetchProducts(category) {
   const response = await axios.get(`${config.API_URL}/products/${category}`)
+  client.setex(category, 300, JSON.stringify(response.data))
   return response.data
 }
 
-app.get('/products/:category', async (req, res) => {
+//Product cache middleware
+async function productCache(req, res, next) {
   const { category } = req.params
-  const products = await fetchProducts(category)
+  client.get(category, async (err, data) => {
+    if (err) throw err
+    if (data !== null) {
+      req.products = JSON.parse(data)
+      next()
+    } else {
+      req.products = await fetchProducts(category)
+      next()
+    }
+  })
+}
 
-  res.json(await addAvailabilityTo(products))
-})
+//Availability cache middleware
+async function availabilityCache(req, res, next) {
+  client.get('availabilityDictionary', (err, data) => {
+    if (err) throw err
+    if (data !== null) {
+      const availabilityDictionary = JSON.parse(data)
+      const products = req.products
 
-app.listen(config.PORT, () => {
-  console.log(`Server running on port ${config.PORT}`)
+      const productsWithAvailability = products.map((product) => ({
+        ...product,
+        availability: availabilityDictionary[product.manufacturer].find(
+          (availability) => availability.id === product.id
+        ).availability,
+      }))
+      res.json(productsWithAvailability)
+    } else {
+      next()
+    }
+  })
+}
+
+app.get(
+  '/products/:category',
+  productCache,
+  availabilityCache,
+  async (req, res) => {
+    const { category } = req.params
+    const products = await fetchProducts(category)
+    res.json(await addAvailabilityTo(products))
+  }
+)
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
 })
