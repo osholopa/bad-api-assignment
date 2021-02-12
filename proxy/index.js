@@ -130,7 +130,6 @@ async function availabilityCache(req, res, next) {
       next()
     }
   })
-  next()
 }
 
 app.use(middleware.extendTimeout)
