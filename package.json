@@ -2,5 +2,8 @@
   "scripts": {
     "heroku-prebuild": "cd proxy && npm install",
     "start": "cd proxy && npm start"
+  },
+  "engines": {
+    "node": "12.x"
   }
 }
