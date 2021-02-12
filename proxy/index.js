@@ -10,8 +10,8 @@ app.use(cors())
 app.use(express.static('build'))
 
 const PORT = config.PORT
-const REDIS_PORT = config.REDIS_PORT
-const client = redis.createClient(REDIS_PORT)
+const REDIS_CONFIG = config.REDIS_CONFIG
+const client = redis.createClient(REDIS_CONFIG)
 
 function uniquePredicate(value, index, self) {
   return self.indexOf(value) === index
