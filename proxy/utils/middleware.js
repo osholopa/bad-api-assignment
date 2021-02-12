@@ -1,4 +1,4 @@
-const extendTimeout = (req, res, next) => {
+async function extendTimeout(req, res, next){
   const space = ' '
   let isFinished = false
   let isDataSent = false
@@ -23,14 +23,14 @@ const extendTimeout = (req, res, next) => {
   })
   const waitAndSend = () => {
     setTimeout(() => {
-      if (!isFinished && !isDataSent) {
+      if (!isFinished  && !isDataSent ) {
         if (!res.headersSent) {
           res.writeHead(202)
         }
         res.write(space)
         waitAndSend()
       }
-    }, 100)
+    }, 1000)
   }
   waitAndSend()
   next()
