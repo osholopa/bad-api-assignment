@@ -132,21 +132,28 @@ async function availabilityCache(req, res, next) {
   })
 }
 
+async function addDelayedAvailabilities(req, res, next) {
+  const { category } = req.params
+  const products = await fetchProducts(category)
+
+  async function slowFunction() {
+    const productsWithAvailabilities = await addAvailabilityTo(products)
+    return productsWithAvailabilities
+  }
+  var delayed = new DelayedResponse(req, res)
+  req.productsWithAvailabilities = await slowFunction(
+    delayed.start(10000, 10000)
+  )
+  next()
+}
+
 app.get(
   '/api/products/:category',
   productCache,
   availabilityCache,
+  addDelayedAvailabilities,
   async (req, res) => {
-    const { category } = req.params
-    const products = await fetchProducts(category)
-
-    async function slowFunction() {
-      const productsWithAvailabilities = await addAvailabilityTo(products)
-      return productsWithAvailabilities
-    }
-    var delayed = new DelayedResponse(req, res)
-    const responseData = await slowFunction(delayed.start(10000, 10000))
-    res.end(responseData)
+    res.end(req.productsWithAvailabilities)
   }
 )
 
