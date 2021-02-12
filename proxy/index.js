@@ -5,6 +5,7 @@ const axios = require('axios')
 const xml2js = require('xml2js')
 const app = express()
 const redis = require('redis')
+const middleware = require('./utils/middleware')
 
 app.use(cors())
 app.use(express.static('build'))
@@ -76,12 +77,14 @@ async function addAvailabilityTo(products) {
       JSON.stringify(availabilityDictionary)
     )
 
-    return products.map((product) => ({
-      ...product,
-      availability: availabilityDictionary[product.manufacturer].find(
-        (availability) => availability.id === product.id
-      ).availability,
-    }))
+    return JSON.stringify(
+      products.map((product) => ({
+        ...product,
+        availability: availabilityDictionary[product.manufacturer].find(
+          (availability) => availability.id === product.id
+        ).availability,
+      }))
+    )
   } catch (err) {
     console.log('Error: ', err)
   }
@@ -127,7 +130,10 @@ async function availabilityCache(req, res, next) {
       next()
     }
   })
+  next()
 }
+
+app.use(middleware.extendTimeout)
 
 app.get(
   '/api/products/:category',
@@ -136,7 +142,7 @@ app.get(
   async (req, res) => {
     const { category } = req.params
     const products = await fetchProducts(category)
-    res.json(await addAvailabilityTo(products))
+    res.end(await addAvailabilityTo(products))
   }
 )
 
