@@ -1,31 +1,33 @@
-import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import React from 'react'
+import PropTypes from 'prop-types'
 import { AppBar, Tabs, Tab } from '@material-ui/core'
 
-const MenuTabs = () => {
-  const history = useHistory()
-  const [value, setValue] = useState(history.location.pathname)
-
-  const handleChange = (event, value) => {
-    setValue(value)
-    history.push(value)
-  }
-
+const MenuTabs = ({ category = 'gloves', setCategory }) => {
   return (
-    <Tabs value={value} onChange={handleChange}>
-      <Tab value="/" label="Gloves" />
-      <Tab value="/facemasks" label="Facemasks" />
-      <Tab value="/beanies" label="Beanies" />
+    <Tabs value={category} onChange={(event, value) => setCategory(value)}>
+      <Tab value="gloves" label="Gloves" />
+      <Tab value="facemasks" label="Facemasks" />
+      <Tab value="beanies" label="Beanies" />
     </Tabs>
   )
 }
 
-const Menu = () => {
+const Menu = (props) => {
   return (
     <AppBar position="static">
-      <MenuTabs />
+      <MenuTabs {...props} />
     </AppBar>
   )
+}
+
+Menu.propTypes = {
+  category: PropTypes.string.isRequired,
+  setCategory: PropTypes.func.isRequired,
+}
+
+MenuTabs.propTypes = {
+  category: PropTypes.string.isRequired,
+  setCategory: PropTypes.func.isRequired,
 }
 
 export default Menu

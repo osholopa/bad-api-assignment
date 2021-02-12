@@ -1,5 +1,4 @@
-import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import React, { useState } from 'react'
 import { Container, CssBaseline, ThemeProvider } from '@material-ui/core'
 
 import Menu from './components/Menu'
@@ -7,22 +6,14 @@ import ProductList from './components/ProductList'
 import theme from './theme'
 
 const App = () => {
+  const [category, setCategory] = useState('gloves')
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Menu />
+      <Menu category={category} setCategory={setCategory} />
       <Container maxWidth="xl">
-        <Switch>
-          <Route path="/" exact>
-            <ProductList category="gloves" />
-          </Route>
-          <Route path="/facemasks" exact>
-            <ProductList category="facemasks" />
-          </Route>
-          <Route path="/beanies" exact>
-            <ProductList category="beanies" />
-          </Route>
-        </Switch>
+        <ProductList category={category} />
       </Container>
     </ThemeProvider>
   )
