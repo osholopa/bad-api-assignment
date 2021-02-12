@@ -1,4 +1,4 @@
-const baseUrl = `${process.env.REACT_APP_PROXY_URI}/products`
+const baseUrl = 'api/products'
 
 const getByCategory = async (category) => {
   const url = `${baseUrl}/${category}`

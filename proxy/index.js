@@ -7,6 +7,7 @@ const app = express()
 const redis = require('redis')
 
 app.use(cors())
+app.use(express.static('build'))
 
 const PORT = config.PORT
 const REDIS_PORT = config.REDIS_PORT
@@ -129,7 +130,7 @@ async function availabilityCache(req, res, next) {
 }
 
 app.get(
-  '/products/:category',
+  '/api/products/:category',
   productCache,
   availabilityCache,
   async (req, res) => {
