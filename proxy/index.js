@@ -143,7 +143,7 @@ async function addDelayedAvailabilities(req, res, next) {
     return await addAvailabilityTo(products)
   }
 
-  slowFunction(delayed.start(50000, 25000))
+  slowFunction(delayed.start(10000, 10000))
     .then((productsWithAvailabilities) => {
       delayed.stop()
       res.locals.productsWithAvailabilities = productsWithAvailabilities
