@@ -132,20 +132,25 @@ async function availabilityCache(req, res, next) {
   })
 }
 
+//Middleware to add availabilities to products while long-polling to keep connection alive
 async function addDelayedAvailabilities(req, res, next) {
   const { category } = req.params
   const products = await fetchProducts(category)
 
-  async function slowFunction() {
-    const productsWithAvailabilities = await addAvailabilityTo(products)
-    return productsWithAvailabilities
-  }
   var delayed = new DelayedResponse(req, res)
-  res.locals.productsWithAvailabilities = await slowFunction(
-    delayed.start(10000, 10000)
-  )
-  delayed.stop()
-  next()
+
+  async function slowFunction() {
+    return await addAvailabilityTo(products)
+  }
+
+  slowFunction(delayed.start(25000, 50000))
+    .then((productsWithAvailabilities) => {
+      delayed.stop()
+      res.locals.productsWithAvailabilities = productsWithAvailabilities
+    })
+    .then(() => {
+      next()
+    })
 }
 
 app.get(
@@ -153,7 +158,7 @@ app.get(
   productCache,
   availabilityCache,
   addDelayedAvailabilities,
-  async (req, res) => {
+  (req, res) => {
     res.end(res.locals.productsWithAvailabilities)
   }
 )
