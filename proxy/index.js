@@ -102,10 +102,10 @@ async function productCache(req, res, next) {
   client.get(category, async (err, data) => {
     if (err) throw err
     if (data !== null) {
-      req.products = JSON.parse(data)
+      res.locals.products = JSON.parse(data)
       next()
     } else {
-      req.products = await fetchProducts(category)
+      res.locals.products = await fetchProducts(category)
       next()
     }
   })
@@ -117,7 +117,7 @@ async function availabilityCache(req, res, next) {
     if (err) throw err
     if (data !== null) {
       const availabilityDictionary = JSON.parse(data)
-      const products = req.products
+      const products = res.locals.products
 
       const productsWithAvailability = products.map((product) => ({
         ...product,
@@ -141,9 +141,10 @@ async function addDelayedAvailabilities(req, res, next) {
     return productsWithAvailabilities
   }
   var delayed = new DelayedResponse(req, res)
-  req.productsWithAvailabilities = await slowFunction(
+  res.locals.productsWithAvailabilities = await slowFunction(
     delayed.start(10000, 10000)
   )
+  delayed.stop()
   next()
 }
 
@@ -153,10 +154,13 @@ app.get(
   availabilityCache,
   addDelayedAvailabilities,
   async (req, res) => {
-    res.end(req.productsWithAvailabilities)
+    res.end(res.locals.productsWithAvailabilities)
   }
 )
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
+
+server.keepAliveTimeout = 120000
+server.headersTimeout = 120500
